@@ -98,7 +98,8 @@ def store_facts_in_database(facts_data, session):
             existing_fact.preview_links = []
             fact = existing_fact
         else:
-            fact = Fact(content=fact_data["content"])
+            current_day_of_week = datetime.now().strftime("%A")
+            fact = Fact(content=fact_data["content"], day_of_week=current_day_of_week)
         
         for preview_link_data in fact_data["preview_links"]:
             existing_link = session.query(PreviewLink).filter(PreviewLink.url == preview_link_data["url"]).first()
@@ -119,7 +120,7 @@ def store_facts_in_database(facts_data, session):
                     caption=featured_image_data["caption"]
                 )
             fact.featured_image = featured_image
-            
+
         session.add(fact)
 
 

@@ -12,6 +12,7 @@ class Fact(Base):
     id = Column(Integer, primary_key=True)
     content = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
+    day_of_week = Column(String)
     analyzed = Column(Boolean, default=False)
     internal_links = Column(String)
     campaign_parameters = Column(String)
