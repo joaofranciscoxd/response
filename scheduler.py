@@ -6,8 +6,8 @@ import datetime
 
 import pytz
 import schedule
-from scrapper import scrapper
-from analyzer import link
+from scrapper import scrapper_bot
+#from analyzer import link
 
 class InvalidGMTOffsetError(ValueError):
     pass
@@ -20,25 +20,24 @@ class Timezone:
 
     def __str__(self):
         if self.offset >= 0:
-            return f"Etc/GMT+{self.offset}"
+            return f"Etc/GMT+{str(self.offset)}"
         else:
-            return f"Etc/GMT{self.offset}"
+            return f"Etc/GMT{str(self.offset)}"
 
 def schedule_jobs(timezone):
     tz = pytz.timezone(str(timezone))
     # Schedule to run at 6AM UTC
-    schedule.every().day.at("6:00", tz).do(scrapper.scrape_wikipedia)
+    schedule.every().day.at("17:26", tz).do(scrapper_bot.scrape_wikipedia) # 6:00
 
     # Schedule to run at 6:10AM UTC
-    schedule.every().day.at("6:10", tz).do(link.link_data)
+    #schedule.every().day.at("6:10", tz).do(link.link_data)
 
     while True:
         schedule.run_pending()
-        time.sleep(60)
+        time.sleep(60) # 60
 
 try:
-    # Example usage: Timezone with GMT offset -3
-    timezone = Timezone(-3)
+    timezone = Timezone(0)
     schedule_jobs(timezone)
 except InvalidGMTOffsetError as e:
     print(f"Error: {str(e)}")
