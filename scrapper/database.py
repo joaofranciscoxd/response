@@ -6,25 +6,12 @@ from datetime import datetime
 
 Base = declarative_base()
 
-
-class Article(Base):
-    __tablename__ = "articles"
-
-    id = Column(Integer, primary_key=True)
-    content = Column(String, unique=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
-
-    facts = relationship("Fact", back_populates="article")
-
-
 class Fact(Base):
     __tablename__ = "facts"
 
     id = Column(Integer, primary_key=True)
     content = Column(String)
-
-    article_id = Column(Integer, ForeignKey("articles.id"))
-    article = relationship("Article", back_populates="facts")
+    created_at = Column(DateTime, default=datetime.utcnow)
 
     preview_links = relationship("PreviewLink", back_populates="fact")
     featured_image = relationship("FeaturedImage", uselist=False, back_populates="fact")

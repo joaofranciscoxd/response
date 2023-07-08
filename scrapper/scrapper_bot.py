@@ -8,7 +8,7 @@ from sqlalchemy import ForeignKey
 import os
 import logging
 from datetime import datetime
-from scrapper.database import Base, Article, Fact, PreviewLink, FeaturedImage
+from scrapper.database import Base, Fact, PreviewLink, FeaturedImage
 
 
 def configure_logger():
@@ -17,12 +17,19 @@ def configure_logger():
     '''
     logging.basicConfig(filename='app.log', level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
 
+class RequestError(ConnectionError):
+    pass
+
 def send_get_request(url):
     '''
     Sends a GET request to the specified URL 
     and returns the response.
     '''
-    response = requests.get(url)
+    try:
+        response = requests.get(url)
+    except:
+        logging.info('Error in request function.')
+        raise RequestError("Could not return any reponse.Check for any connection problem or blocking.")
     return response
 
 def parse_wikipedia_page(response):
@@ -83,28 +90,39 @@ def create_database_tables(engine):
 
 def store_facts_in_database(facts_data, session):
     '''
-    Stores the facts data in the database by creating or linking to existing articles.
+    Stores the facts data in the database by creating or updating existing facts.
     '''
     for fact_data in facts_data:
-        existing_article = session.query(Article).filter(Article.content == fact_data["content"]).first()
-        if existing_article:
-            article = existing_article
+        existing_fact = session.query(Fact).filter(Fact.content == fact_data["content"]).first()
+        if existing_fact:
+            existing_fact.preview_links = []
+            fact = existing_fact
         else:
-            article = Article(content=fact_data["content"])
-            session.add(article)
-        
-        fact = Fact(content=fact_data["content"], article=article)
+            fact = Fact(content=fact_data["content"])
         
         for preview_link_data in fact_data["preview_links"]:
-            preview_link = PreviewLink(url=preview_link_data["url"])
+            existing_link = session.query(PreviewLink).filter(PreviewLink.url == preview_link_data["url"]).first()
+            if existing_link:
+                preview_link = existing_link
+            if not existing_link:
+                preview_link = PreviewLink(url=preview_link_data["url"])
             fact.preview_links.append(preview_link)
         
         featured_image_data = fact_data["featured_image"]
         if featured_image_data:
-            featured_image = FeaturedImage(image_url=featured_image_data["url"], caption=featured_image_data["caption"])
+            existing_image = session.query(FeaturedImage).filter(FeaturedImage.image_url == featured_image_data["url"]).first()
+            if existing_image:
+                featured_image = existing_image
+            if not existing_image:
+                featured_image = FeaturedImage(
+                    image_url=featured_image_data["url"],
+                    caption=featured_image_data["caption"]
+                )
             fact.featured_image = featured_image
-        
+            
         session.add(fact)
+
+
 
 def scrape_wikipedia():
     configure_logger()
