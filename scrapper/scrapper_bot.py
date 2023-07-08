@@ -1,10 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
-from sqlalchemy import create_engine, Column, Integer, String, DateTime
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.orm import relationship
-from sqlalchemy import ForeignKey
 import os
 import logging
 from datetime import datetime
@@ -122,8 +119,6 @@ def store_facts_in_database(facts_data, session):
             fact.featured_image = featured_image
 
         session.add(fact)
-
-
 
 def scrape_wikipedia():
     configure_logger()
