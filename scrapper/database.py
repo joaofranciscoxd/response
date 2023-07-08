@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import ForeignKey
@@ -12,6 +12,9 @@ class Fact(Base):
     id = Column(Integer, primary_key=True)
     content = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
+    analyzed = Column(Boolean, default=False)
+    internal_links = Column(String)
+    campaign_parameters = Column(String)
 
     preview_links = relationship("PreviewLink", back_populates="fact")
     featured_image = relationship("FeaturedImage", uselist=False, back_populates="fact")
