@@ -6,7 +6,8 @@ import os
 import logging
 from datetime import datetime
 from scrapper.database import Base, Fact, PreviewLink, FeaturedImage
-
+import warnings
+warnings.filterwarnings("ignore")
 
 def configure_logger():
     '''
