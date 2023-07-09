@@ -7,6 +7,8 @@ import re
 import datetime
 from scrapper.database import Fact
 import logging
+import warnings
+warnings.filterwarnings("ignore")
 
 engine = create_engine("sqlite:///wiki_data.db")
 Session = sessionmaker(bind=engine)
@@ -139,25 +141,32 @@ def check_temporal_relevance(fact):
 
     '''Example: Check if the fact contains a year between years from 1800 to 2023
     '''
-    year_pattern = r"\b(1[89]\d{2}|20[01]\d|2023)\b"
+    year_pattern = r"\b(18\d{2}|19\d{2}|20[01]\d|202[0-2]|2023)\b"
     if re.search(year_pattern, fact.content):
         return True
     else:
         return False
     
 def get_date(fact):
-    '''Extract the date from the fact content or database
     '''
-    '''Example: Extract the date from the fact content if it follows a specific format
+    Extract the date from the fact content if it follows a specific format
     '''
-    date_pattern = r"\b\d{4}-\d{2}-\d{2}\b" 
-    
+    date_pattern = r"\b(\d{4}-\d{2}|\d{4})\b"
+
     match = re.search(date_pattern, fact.content)
     if match:
         date_str = match.group(0)
-        return str(datetime.datetime.strptime(date_str, "%Y-%m-%d").date())
+        if len(date_str) == 4:
+            # Only the year is mentioned, complete with month and day
+            date_str += "-01-01"
+        elif len(date_str) == 7:
+            # Year and month are mentioned, complete with day
+            date_str += "-01"
+        return datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
     else:
         return None
+
+
     
 def get_fact_length(fact):
     '''Calculate the length of the fact content
