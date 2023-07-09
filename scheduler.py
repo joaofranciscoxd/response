@@ -1,13 +1,10 @@
 import os
 os.system('cls')
 import time
-import math
-import datetime
-
 import pytz
 import schedule
 from scrapper import scrapper_bot
-#from analyzer import link
+from analyzer import fetcher
 
 class InvalidGMTOffsetError(ValueError):
     pass
@@ -27,14 +24,14 @@ class Timezone:
 def schedule_jobs(timezone):
     tz = pytz.timezone(str(timezone))
     # Schedule to run at 6AM UTC
-    schedule.every().day.at("17:26", tz).do(scrapper_bot.scrape_wikipedia) # 6:00
+    schedule.every().day.at("20:58", tz).do(scrapper_bot.scrape_wikipedia) # 6:00
 
     # Schedule to run at 6:10AM UTC
-    #schedule.every().day.at("6:10", tz).do(link.link_data)
+    schedule.every().day.at("20:59", tz).do(fetcher.analyze_and_suggest) # 6:10
 
     while True:
         schedule.run_pending()
-        time.sleep(60) # 60
+        time.sleep(10) # 60
 
 try:
     timezone = Timezone(0)
