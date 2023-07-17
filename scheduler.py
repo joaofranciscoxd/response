@@ -24,10 +24,10 @@ class Timezone:
 def schedule_jobs(timezone):
     tz = pytz.timezone(str(timezone))
     # Schedule to run at 6AM UTC
-    schedule.every().day.at("6:00", tz).do(scrapper_bot.scrape_wikipedia) # 6:00
+    schedule.every().day.at("06:00", tz).do(scrapper_bot.scrape_wikipedia) # 06:00
 
     # Schedule to run at 6:10AM UTC
-    schedule.every().day.at("6:10", tz).do(fetcher.analyze_and_suggest) # 6:10
+    schedule.every().day.at("06:10", tz).do(fetcher.analyze_and_suggest) # 06:10
 
     while True:
         schedule.run_pending()
